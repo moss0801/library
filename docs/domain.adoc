@@ -1,0 +1,99 @@
+== 도메인(Domain)
+
+[plantuml, diagram-classes, svg]
+....
+package "Book" {
+  class Book {
+    -bookId: Long
+    -isbn: String
+    -subject: String
+    -author: String
+    -published: OffsetDateTime
+    -callNumber: CallNumber
+    -bookStatus: BookStatus
+    +void changeBookStatus(bootStatus: BookStatus)
+  }
+
+  '청구기호
+  class CallNumber {
+    'https://m.blog.naver.com/tomalss/220642264142
+    'https://blog.naver.com/chjeon/220845339589
+    '별치기호: R (장소를 기호로 표현한 )
+    -locationSymbol: String
+    '분류기호: 024.3 (자료분류에 근거하여 주제를 기호로 변환한 것)
+    -classNumber: String
+    '도서기: 전82ㅈ (동일한 분번호를 가진 자료를 서로 식별하기 위한 것 (수입순기호법, 연대순기호법, 저자기호))
+    -bookNumber: String
+    '부차적기호: -2=3 자료의 형태적 또는 내용적 속성 표현
+    '  - 복본기호: 동일자료 식별 '=' or 'c.'
+    '  - 권호기호: 다권본이나 연속간행물 '-' or 'v.'
+    '  - 연도기호
+    '  - 판차기호: 개정,수정,증보 등 내용이나 형태가 변형되어 전판과 구분하기 위함
+    '  - 역자기호: 번역서의 경우 원저작과 식별하기 위해 번역자를 부가하는 기호
+    '  - 색인,부록기호: 형태가 색인이나 부록인 것을 모체자료와 구분하기 위한 기호
+    -additionalNumber: String
+  }
+
+  enum BookStatus {
+    Available
+    NotAvailable
+  }
+}
+
+package "Operator" {
+  class Operator {
+    -operationId: Long
+    -role: Role
+    -account: String
+    -name: String
+    -password: String
+  }
+
+  class Librarian {
+    +checkOut(boo: Book, customer: Customer)
+    +return(book: Book, customer: Customer)
+  }
+
+  class Manager {
+
+  }
+
+  enum Role {
+    Manager
+    Librarian
+  }
+}
+
+package "Customer" {
+  class Customer {
+    -customerId: Long
+    -name: String
+    -registered: OffsetDateTime
+    +void checkOut(book: Book)
+    +void return(book: Book)
+    +List<Book> rentalBookList()
+  }
+}
+
+package "Rent" {
+ class Rent {
+   -rentId: Long
+   -book: Book
+   -customer: Customer
+   -librarian: Librarian
+   -rented: OffsetDateTime
+   -dueDate: OffsetDateTime
+   -returned: OffsetDateTime
+   +Rent return()
+ }
+}
+
+Book *-- CallNumber
+Operator <|-- Librarian
+Librarian <|-- Manager
+Rent o-- Customer
+Rent o-- Book
+Rent o-- Librarian
+Book <.. Librarian
+Customer <.. Librarian
+....
