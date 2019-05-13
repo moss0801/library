@@ -11,6 +11,7 @@ package "Book" {
     -published: OffsetDateTime
     -callNumber: CallNumber
     -bookStatus: BookStatus
+    -registered: LocalDateTime
     +void changeBookStatus(bootStatus: BookStatus)
   }
 
@@ -22,7 +23,7 @@ package "Book" {
     -locationSymbol: String
     '분류기호: 024.3 (자료분류에 근거하여 주제를 기호로 변환한 것)
     -classNumber: String
-    '도서기: 전82ㅈ (동일한 분번호를 가진 자료를 서로 식별하기 위한 것 (수입순기호법, 연대순기호법, 저자기호))
+    '도서기호: 전82ㅈ (동일한 분번호를 가진 자료를 서로 식별하기 위한 것 (수입순기호법, 연대순기호법, 저자기호))
     -bookNumber: String
     '부차적기호: -2=3 자료의 형태적 또는 내용적 속성 표현
     '  - 복본기호: 동일자료 식별 '=' or 'c.'
@@ -36,64 +37,35 @@ package "Book" {
 
   enum BookStatus {
     Available
-    NotAvailable
+    Inavailable
   }
 }
 
-package "Operator" {
-  class Operator {
-    -operationId: Long
-    -role: Role
-    -account: String
-    -name: String
-    -password: String
-  }
-
-  class Librarian {
-    +checkOut(boo: Book, customer: Customer)
-    +return(book: Book, customer: Customer)
-  }
-
-  class Manager {
-
-  }
-
-  enum Role {
-    Manager
-    Librarian
-  }
-}
-
-package "Customer" {
-  class Customer {
-    -customerId: Long
+package "User" {
+  class User {
+    -userId: Long
     -name: String
     -registered: OffsetDateTime
-    +void checkOut(book: Book)
+    -rentalBookIdList: List<Long>
+    +void rent(book: Book)
     +void return(book: Book)
-    +List<Book> rentalBookList()
   }
 }
 
 package "Rent" {
  class Rent {
    -rentId: Long
-   -book: Book
-   -customer: Customer
-   -librarian: Librarian
+   -bookId: Long
+   -userId: Long
    -rented: OffsetDateTime
    -dueDate: OffsetDateTime
    -returned: OffsetDateTime
-   +Rent return()
  }
 }
 
 Book *-- CallNumber
-Operator <|-- Librarian
-Librarian <|-- Manager
-Rent o-- Customer
+Rent o-- User
 Rent o-- Book
-Rent o-- Librarian
-Book <.. Librarian
-Customer <.. Librarian
+
 ....
+
